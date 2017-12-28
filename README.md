@@ -1,0 +1,1 @@
+Payment Services Gateway temporary git project (till GAPI infrastructure is shared)
