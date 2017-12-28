@@ -1,25 +1,16 @@
 package com.kingfisher.payment.api.optile.model;
 
-import java.util.Objects;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
-import io.swagger.annotations.ApiModel;
+import com.kingfisher.payment.api.validator.annotation.DisallowedField;
 import io.swagger.annotations.ApiModelProperty;
-import com.kingfisher.payment.api.optile.model.Callback;
-import com.kingfisher.payment.api.optile.model.ClientInfo;
-import com.kingfisher.payment.api.optile.model.Customer;
-import com.kingfisher.payment.api.optile.model.ExtraElements;
-import com.kingfisher.payment.api.optile.model.Installment;
-import com.kingfisher.payment.api.optile.model.Mandate;
-import com.kingfisher.payment.api.optile.model.Payment;
-import com.kingfisher.payment.api.optile.model.Preselection;
-import com.kingfisher.payment.api.optile.model.Product;
-import com.kingfisher.payment.api.optile.model.Style;
+
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
-import javax.validation.Valid;
-import javax.validation.constraints.*;
+import java.util.Objects;
 
 /**
  * Transaction
@@ -64,9 +55,11 @@ public class Transaction   {
   }
 
   @JsonProperty("integration")
+  @DisallowedField
   private IntegrationEnum integration = null;
 
   @JsonProperty("transactionId")
+  @DisallowedField
   private String transactionId = null;
 
   @JsonProperty("country")
@@ -148,7 +141,7 @@ public class Transaction   {
   private List<Product> products = null;
 
   @JsonProperty("updateOnly")
-  private Boolean updateOnly = null;
+  private Boolean updateOnly = false;
 
   @JsonProperty("presetFirst")
   private Boolean presetFirst = null;
@@ -197,8 +190,8 @@ public class Transaction   {
    * Identifier for this transaction given by the merchant; it is not validated for uniqueness by OPG, but may be checked for by some PSPs, thus recommended to be unique 
    * @return transactionId
   **/
-  @ApiModelProperty(example = "O-000016565/0176", required = true, value = "Identifier for this transaction given by the merchant; it is not validated for uniqueness by OPG, but may be checked for by some PSPs, thus recommended to be unique ")
-  @NotNull
+  @ApiModelProperty(example = "O-000016565/0176", required = false, value = "Identifier for this transaction given by the merchant; it is not validated for uniqueness by OPG, but may be checked for by some PSPs, thus recommended to be unique ")
+
 
 
   public String getTransactionId() {

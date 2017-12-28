@@ -4,13 +4,13 @@ public class ErrorResponse {
 
     private int status;
     private String error;
-    private OptileDetails details;
+    private String details;
 
     public ErrorResponse(){
         // epmty
     }
 
-    public ErrorResponse(int status, String error, OptileDetails details) {
+    public ErrorResponse(int status, String error, String details) {
         this.status = status;
         this.error = error;
         this.details = details;
@@ -24,7 +24,7 @@ public class ErrorResponse {
         return error;
     }
 
-    public OptileDetails getDetails() {
+    public String getDetails() {
         return details;
     }
 

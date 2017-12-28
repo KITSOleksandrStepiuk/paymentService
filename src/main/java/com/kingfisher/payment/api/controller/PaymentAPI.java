@@ -2,30 +2,36 @@ package com.kingfisher.payment.api.controller;
 
 import com.kingfisher.payment.api.database.model.CustomerRegistrationInfo;
 import com.kingfisher.payment.api.database.model.TransactionLogInfo;
+import com.kingfisher.payment.api.database.service.CustomerService;
+import com.kingfisher.payment.api.database.service.TransactionLogService;
+import com.kingfisher.payment.api.error.InputDTOValidationException;
 import com.kingfisher.payment.api.model.ListRequestDTO;
 import com.kingfisher.payment.api.optile.error.model.ErrorResponse;
 import com.kingfisher.payment.api.optile.model.*;
 import com.kingfisher.payment.api.optile.service.OptileService;
-import com.kingfisher.payment.api.database.service.CustomerService;
-import com.kingfisher.payment.api.database.service.TransactionLogService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.dozer.DozerBeanMapper;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
+import javax.validation.constraints.NotNull;
 import java.net.UnknownHostException;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
 @CrossOrigin
 @RestController
-@RequestMapping("/api/v1/payment")
+@RequestMapping("api/v1/payment")
 public class PaymentAPI {
 
     @Autowired
@@ -36,6 +42,10 @@ public class PaymentAPI {
     private TransactionLogService transactionLogService;
     @Autowired
     private DozerBeanMapper dozerBeanMapper;
+    @Autowired
+    private Validator validator;
+    @Value("{optile.integration.mode}")
+    private String integrationMode;
 
     @ApiOperation(value = "Create Payment session for new transaction")
     @ApiResponses({
@@ -47,9 +57,19 @@ public class PaymentAPI {
             path="/session/create",
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<NetworkList> createPaymentSession(@RequestBody ListRequestDTO request) {
+    public ResponseEntity<NetworkList> createPaymentSession(@RequestBody ListRequestDTO request) throws InputDTOValidationException {
+
+        Set<ConstraintViolation<ListRequestDTO>> violations = validator.validate(request);
+
+        if(!violations.isEmpty()) {
+            throw new InputDTOValidationException(violations);
+        }
 
         Transaction transaction = dozerBeanMapper.map(request, Transaction.class);
+        transaction.setIntegration(Transaction.IntegrationEnum.fromValue(integrationMode));
+        transaction.setTransactionId(generateTransactionId(request.getOrderId(), request.getCustomer().getNumber()));
+        //TODO get actual host + notification endpoint url and save to transaction
+        transaction.getCallback().setNotificationUrl("");
 
         Optional<CustomerRegistrationInfo> registrationInfo = customerService.getCustomerRegistrationInfo(request.getCustomer().getNumber());
         registrationInfo.ifPresent(regInfo -> populateRequestWithCustomerRegistrationInfo(regInfo, transaction));
@@ -59,6 +79,17 @@ public class PaymentAPI {
         initAndSaveNewTransactionLogInfo(transaction, response, request.getOrderId(), registrationInfo);
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    private String generateTransactionId(@NotNull String orderId, @NotNull String custromerId) {
+
+        return new StringBuilder()
+            .append(DateTime.now().getMillis())
+            .append("-")
+            .append(orderId)
+            .append("-")
+            .append(custromerId).toString();
+
     }
 
     @ApiOperation(value = "Close session transaction from ATG")

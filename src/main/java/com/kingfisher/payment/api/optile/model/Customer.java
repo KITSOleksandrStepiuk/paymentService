@@ -1,13 +1,12 @@
 package com.kingfisher.payment.api.optile.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.datatype.joda.deser.LocalDateDeserializer;
+import com.kingfisher.payment.api.validator.annotation.DisallowedField;
 import io.swagger.annotations.ApiModelProperty;
+import org.joda.time.LocalDate;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import org.joda.time.LocalDate;
 import java.util.Objects;
 
 /**
@@ -35,6 +34,7 @@ public class Customer   {
   private Phones phones = null;
 
   @JsonProperty("registration")
+  @DisallowedField
   private Registration registration = null;
 
   public Customer number(String number) {

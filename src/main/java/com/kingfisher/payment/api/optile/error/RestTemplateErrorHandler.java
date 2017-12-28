@@ -1,8 +1,8 @@
 package com.kingfisher.payment.api.optile.error;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kingfisher.payment.api.error.ErrorResponseException;
 import com.kingfisher.payment.api.optile.error.model.ErrorResponse;
-import com.kingfisher.payment.api.optile.error.model.OptileDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.util.StreamUtils;
@@ -25,11 +25,10 @@ public class RestTemplateErrorHandler implements ResponseErrorHandler {
     public void handleError(ClientHttpResponse response) throws IOException {
         String body = StreamUtils.copyToString(response.getBody(), Charset.defaultCharset());
 
-        OptileDetails details = objectMapper.readValue(body != null && body.length() >  0 ? body : "{}", OptileDetails.class);
         throw new ErrorResponseException(new ErrorResponse(
                 response.getStatusCode().value(),
                 response.getStatusCode().getReasonPhrase(),
-                details
+                body
         ));
     }
 }

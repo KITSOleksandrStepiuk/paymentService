@@ -1,4 +1,4 @@
-package com.kingfisher.payment.api.optile.error;
+package com.kingfisher.payment.api.error;
 
 import com.kingfisher.payment.api.optile.error.model.ErrorResponse;
 
