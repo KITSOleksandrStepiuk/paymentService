@@ -1,0 +1,24 @@
+{
+  "orderId": "o2314i91",
+  "transactionId": "{{$guid}}",
+  "country": "GB",
+  "integration":"SELECTIVE_NATIVE",
+  "presetFirst": true,
+  "customer": {
+    "number": "1011021666"
+  },
+  "payment": {
+    "amount": 19.99,
+    "currency": "GBP",
+    "reference": "B&Q UK 22-11-2017"
+  },
+  "preselection": {
+    "deferral": "DEFERRED"
+  },
+  "callback": {
+    "returnUrl": "https://127.0.0.1:8080/payment/success",
+    "cancelUrl": "https://127.0.0.1:8080/payment/cancel",
+    "summaryUrl": "https://127.0.0.1:8080/payment/success",
+    "notificationUrl":"https://127.0.0.1:8080/shop/notify.html"
+  }
+}

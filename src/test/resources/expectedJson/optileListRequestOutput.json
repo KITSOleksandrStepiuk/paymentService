@@ -1,0 +1,111 @@
+{
+  "links": {
+    "self": "https://api.sandbox.oscato.com/pci/v1/5a43bba6148b512dfef551a4lav1gcb6roq13eb4225k899gn3"
+  },
+  "timestamp": "2017-12-27T15:26:30.682+0000",
+  "operation": "LIST",
+  "resultCode": "00000.11.000",
+  "resultInfo": "4 applicable and 0 registered networks are found",
+  "returnCode": {
+    "name": "OK",
+    "source": "GATEWAY"
+  },
+  "status": {
+    "code": "listed",
+    "reason": "listed"
+  },
+  "interaction": {
+    "code": "PROCEED",
+    "reason": "OK"
+  },
+  "identification": {
+    "longId": "5a43bba6148b512dfef551a4lav1gcb6roq13eb4225k899gn3",
+    "shortId": "09756-73987",
+    "transactionId": "da1a3771-0140-4104-9d31-e5cabe8b63e7"
+  },
+  "networks": {
+    "applicable": [
+      {
+        "iframeHeight": 152,
+        "links": {
+          "iframe": "https://resources.sandbox.oscato.com/paymentpage/iframe.html?listId=5a43bba6148b512dfef551a4lav1gcb6roq13eb4225k899gn3&network=MASTERCARD",
+          "self": "https://api.sandbox.oscato.com/pci/v1/5a43bba6148b512dfef551a4lav1gcb6roq13eb4225k899gn3/MASTERCARD",
+          "logo": "https://resources.sandbox.oscato.com/resource/network/KINGFISHER/en_GB/MASTERCARD/logo.png",
+          "lang": "https://resources.sandbox.oscato.com/resource/lang/KINGFISHER/en_GB/MASTERCARD.properties",
+          "iFrame": "https://resources.sandbox.oscato.com/paymentpage/iframe.html?listId=5a43bba6148b512dfef551a4lav1gcb6roq13eb4225k899gn3&network=MASTERCARD"
+        },
+        "code": "MASTERCARD",
+        "label": "MasterCard",
+        "method": "CREDIT_CARD",
+        "grouping": "CREDIT_CARD",
+        "registration": "OPTIONAL",
+        "recurrence": "NONE",
+        "redirect": false,
+        "button": "button.preset.label",
+        "selected": false,
+        "iFrameHeight": 152
+      },
+      {
+        "iframeHeight": 152,
+        "links": {
+          "iframe": "https://resources.sandbox.oscato.com/paymentpage/iframe.html?listId=5a43bba6148b512dfef551a4lav1gcb6roq13eb4225k899gn3&network=VISA",
+          "self": "https://api.sandbox.oscato.com/pci/v1/5a43bba6148b512dfef551a4lav1gcb6roq13eb4225k899gn3/VISA",
+          "logo": "https://resources.sandbox.oscato.com/resource/network/KINGFISHER/en_GB/VISA/logo.png",
+          "lang": "https://resources.sandbox.oscato.com/resource/lang/KINGFISHER/en_GB/VISA.properties",
+          "iFrame": "https://resources.sandbox.oscato.com/paymentpage/iframe.html?listId=5a43bba6148b512dfef551a4lav1gcb6roq13eb4225k899gn3&network=VISA"
+        },
+        "code": "VISA",
+        "label": "Visa",
+        "method": "CREDIT_CARD",
+        "grouping": "CREDIT_CARD",
+        "registration": "OPTIONAL",
+        "recurrence": "NONE",
+        "redirect": false,
+        "button": "button.preset.label",
+        "selected": false,
+        "iFrameHeight": 152
+      },
+      {
+        "iframeHeight": 152,
+        "links": {
+          "iframe": "https://resources.sandbox.oscato.com/paymentpage/iframe.html?listId=5a43bba6148b512dfef551a4lav1gcb6roq13eb4225k899gn3&network=MAESTRO",
+          "self": "https://api.sandbox.oscato.com/pci/v1/5a43bba6148b512dfef551a4lav1gcb6roq13eb4225k899gn3/MAESTRO",
+          "logo": "https://resources.sandbox.oscato.com/resource/network/KINGFISHER/en_GB/MAESTRO/logo.png",
+          "lang": "https://resources.sandbox.oscato.com/resource/lang/KINGFISHER/en_GB/MAESTRO.properties",
+          "iFrame": "https://resources.sandbox.oscato.com/paymentpage/iframe.html?listId=5a43bba6148b512dfef551a4lav1gcb6roq13eb4225k899gn3&network=MAESTRO"
+        },
+        "code": "MAESTRO",
+        "label": "Maestro",
+        "method": "DEBIT_CARD",
+        "grouping": "DEBIT_CARD",
+        "registration": "OPTIONAL",
+        "recurrence": "NONE",
+        "redirect": false,
+        "button": "button.preset.label",
+        "selected": false,
+        "iFrameHeight": 152
+      },
+      {
+        "links": {
+          "self": "https://api.sandbox.oscato.com/pci/v1/5a43bba6148b512dfef551a4lav1gcb6roq13eb4225k899gn3/PAYPAL",
+          "operation": "https://api.sandbox.oscato.com/pci/v1/5a43bba6148b512dfef551a4lav1gcb6roq13eb4225k899gn3/PAYPAL/preset",
+          "validation": "https://api.sandbox.oscato.com/pci/v1/5a43bba6148b512dfef551a4lav1gcb6roq13eb4225k899gn3/KINGFISHER/en_GB/PAYPAL/standard/validate",
+          "logo": "https://resources.sandbox.oscato.com/resource/network/KINGFISHER/en_GB/PAYPAL/logo.png",
+          "form": "https://resources.sandbox.oscato.com/resource/form/PAYPAL/standard.html",
+          "localizedForm": "https://resources.sandbox.oscato.com/resource/form/KINGFISHER/GB/en_GB/PAYPAL/standard.html",
+          "lang": "https://resources.sandbox.oscato.com/resource/lang/KINGFISHER/en_GB/PAYPAL.properties"
+        },
+        "code": "PAYPAL",
+        "label": "PayPal",
+        "method": "WALLET",
+        "grouping": "WALLET",
+        "registration": "OPTIONAL",
+        "recurrence": "NONE",
+        "redirect": true,
+        "button": "button.preset.label",
+        "selected": false
+      }
+    ]
+  },
+  "operationType": "PRESET"
+}
