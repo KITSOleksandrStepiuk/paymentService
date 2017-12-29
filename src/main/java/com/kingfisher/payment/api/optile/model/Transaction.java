@@ -141,7 +141,8 @@ public class Transaction   {
   private List<Product> products = null;
 
   @JsonProperty("updateOnly")
-  private Boolean updateOnly = false;
+  @DisallowedField
+  private Boolean updateOnly = null;
 
   @JsonProperty("presetFirst")
   private Boolean presetFirst = null;

@@ -1,17 +1,9 @@
 package com.kingfisher.payment.api.optile.model;
 
-import java.util.Objects;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.validation.Valid;
-import javax.validation.constraints.*;
+import java.util.Objects;
 
 /**
  * Registration
@@ -35,9 +27,7 @@ public class Registration   {
    * Customer registration ID within OPG platform; generated and supplied to merchant when a customer gets registered in OPG
    * @return id
   **/
-  @ApiModelProperty(example = "59e07b240bd6e05fe60f063au", required = true, value = "Customer registration ID within OPG platform; generated and supplied to merchant when a customer gets registered in OPG")
-  @NotNull
-
+  @ApiModelProperty(example = "59e07b240bd6e05fe60f063au", required = false, value = "Customer registration ID within OPG platform; generated and supplied to merchant when a customer gets registered in OPG")
 
   public String getId() {
     return id;
