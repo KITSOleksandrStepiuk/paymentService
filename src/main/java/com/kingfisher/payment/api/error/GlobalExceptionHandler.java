@@ -1,24 +1,30 @@
 package com.kingfisher.payment.api.error;
 
-import com.kingfisher.payment.api.optile.error.model.ErrorResponse;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kingfisher.payment.api.optile.model.ErrorInfo;
 import com.kingfisher.payment.api.optile.model.Interaction;
 import org.apache.http.conn.ConnectTimeoutException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.client.ResourceAccessException;
 
+import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@Order(value = 1)
 @ControllerAdvice
 class GlobalExceptionHandler {
 
+    @Autowired
+    private ObjectMapper objectMapper;
 
     private Map<Class<? extends Throwable>, HttpStatus> rules = new HashMap<>();
 
@@ -29,7 +35,13 @@ class GlobalExceptionHandler {
 
     @ExceptionHandler({ErrorResponseException.class})
     public ResponseEntity handle(ErrorResponseException e){
-        return ResponseEntity.status(e.getErrorResponse().getStatus()).body(e.getErrorResponse());
+        try {
+            final ErrorInfo info = objectMapper.readValue(e.getErrorResponse().getDetails(), ErrorInfo.class);
+            return ResponseEntity.status(e.getErrorResponse().getStatus()).body(info);
+        } catch (IOException e1) {
+            e1.printStackTrace();
+        }
+        return ResponseEntity.status(e.getErrorResponse().getStatus()).body(e.getErrorResponse().getDetails());
     }
 
     @ExceptionHandler({ResourceAccessException.class})
@@ -39,8 +51,17 @@ class GlobalExceptionHandler {
             status = rules.get(e.getCause().getClass());
         }
 
-        ErrorResponse response = new ErrorResponse(status.value(), status.getReasonPhrase(), e.getMessage());
-        return ResponseEntity.status(status.value()).body(response);
+        ErrorInfo info = new ErrorInfo();
+
+        Interaction interaction = new Interaction();
+        interaction.setCode(Interaction.CodeEnum.ABORT);
+        interaction.setReason(Interaction.ReasonEnum.BLOCKED);
+
+        info.setInteraction(interaction);
+        info.setResultInfo(status.getReasonPhrase());
+        info.setResultInfo(status.getReasonPhrase());
+
+        return ResponseEntity.status(status.value()).body(info);
     }
 
     @ExceptionHandler({InputDTOValidationException.class})
@@ -66,6 +87,5 @@ class GlobalExceptionHandler {
 
         return ResponseEntity.status(status.value()).body(info);
     }
-
 
 }
