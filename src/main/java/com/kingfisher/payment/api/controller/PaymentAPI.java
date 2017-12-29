@@ -16,6 +16,7 @@ import org.dozer.DozerBeanMapper;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -44,8 +45,14 @@ public class PaymentAPI {
     private DozerBeanMapper dozerBeanMapper;
     @Autowired
     private Validator validator;
-    @Value("{optile.integration.mode}")
+    @Autowired
+    Environment environment;
+    @Value("${optile.DTO.transaction.integration.mode}")
     private String integrationMode;
+    @Value("${optile.DTO.transaction.updateOnly}")
+    private boolean updateOnly;
+    @Value("${otile.notification.url}")
+    private String notificationUrl;
 
     @ApiOperation(value = "Create Payment session for new transaction")
     @ApiResponses({
@@ -66,10 +73,7 @@ public class PaymentAPI {
         }
 
         Transaction transaction = dozerBeanMapper.map(request, Transaction.class);
-        transaction.setIntegration(Transaction.IntegrationEnum.fromValue(integrationMode));
-        transaction.setTransactionId(generateTransactionId(request.getOrderId(), request.getCustomer().getNumber()));
-        //TODO get actual host + notification endpoint url and save to transaction
-        transaction.getCallback().setNotificationUrl("");
+        populateTransactionWithStaticDataAndGenerateTransactionId(transaction, request.getOrderId());
 
         Optional<CustomerRegistrationInfo> registrationInfo = customerService.getCustomerRegistrationInfo(request.getCustomer().getNumber());
         registrationInfo.ifPresent(regInfo -> populateRequestWithCustomerRegistrationInfo(regInfo, transaction));
@@ -79,17 +83,6 @@ public class PaymentAPI {
         initAndSaveNewTransactionLogInfo(transaction, response, request.getOrderId(), registrationInfo);
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
-    }
-
-    private String generateTransactionId(@NotNull String orderId, @NotNull String custromerId) {
-
-        return new StringBuilder()
-            .append(DateTime.now().getMillis())
-            .append("-")
-            .append(orderId)
-            .append("-")
-            .append(custromerId).toString();
-
     }
 
     @ApiOperation(value = "Close session transaction from ATG")
@@ -171,6 +164,25 @@ public class PaymentAPI {
     public ResponseEntity closePaymentCharge(@PathVariable("listId") String listId) {
         ResponseEntity entity = optileService.cancelListSession(listId);
         return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+
+    private void populateTransactionWithStaticDataAndGenerateTransactionId(Transaction transaction, String orderId) {
+        transaction.setIntegration(Transaction.IntegrationEnum.fromValue(integrationMode));
+        transaction.setTransactionId(generateTransactionId(orderId, transaction.getCustomer().getNumber()));
+        transaction.setUpdateOnly(updateOnly);
+        transaction.getCallback().setNotificationUrl(notificationUrl);
+    }
+
+    private String generateTransactionId(@NotNull String orderId, @NotNull String custromerId) {
+
+        return new StringBuilder()
+                .append(DateTime.now().getMillis())
+                .append("-")
+                .append(orderId)
+                .append("-")
+                .append(custromerId).toString();
+
     }
 
     private void populateRequestWithCustomerRegistrationInfo(CustomerRegistrationInfo registrationInfo, Transaction transactionRequest) {
