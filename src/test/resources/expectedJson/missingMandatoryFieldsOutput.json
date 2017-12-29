@@ -1,0 +1,8 @@
+{
+  "resultInfo":"Errors: payment must not be null, callback must not be null, country must not be null, customer must not be null",
+  "interaction":
+  {
+    "code":"ABORT",
+    "reason":"BLOCKED"
+  }
+}

@@ -2,7 +2,7 @@
   "links": {
     "self": "https://api.sandbox.oscato.com/pci/v1/5a43bba6148b512dfef551a4lav1gcb6roq13eb4225k899gn3"
   },
-  "timestamp": "2017-12-27T15:26:30.682+0000",
+  "timestamp": "2017-12-27T15:26:30.682Z",
   "operation": "LIST",
   "resultCode": "00000.11.000",
   "resultInfo": "4 applicable and 0 registered networks are found",
