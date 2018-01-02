@@ -2,7 +2,6 @@ package com.kingfisher.payment.api.error;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kingfisher.payment.api.optile.model.ErrorInfo;
-import com.kingfisher.payment.api.optile.model.Interaction;
 import org.apache.http.conn.ConnectTimeoutException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
@@ -14,6 +13,7 @@ import org.springframework.web.client.ResourceAccessException;
 
 import java.io.IOException;
 import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,21 +45,13 @@ class GlobalExceptionHandler {
     }
 
     @ExceptionHandler({ResourceAccessException.class})
-    public ResponseEntity handle(Exception e){
+    public ResponseEntity handle(ResourceAccessException e){
         HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
         if(rules.containsKey(e.getCause().getClass())) {
             status = rules.get(e.getCause().getClass());
         }
 
-        ErrorInfo info = new ErrorInfo();
-
-        Interaction interaction = new Interaction();
-        interaction.setCode(Interaction.CodeEnum.ABORT);
-        interaction.setReason(Interaction.ReasonEnum.BLOCKED);
-
-        info.setInteraction(interaction);
-        info.setResultInfo(status.getReasonPhrase());
-        info.setResultInfo(status.getReasonPhrase());
+        ErrorInfo info = new ErrorInfo(status.getReasonPhrase());
 
         return ResponseEntity.status(status.value()).body(info);
     }
@@ -70,22 +62,20 @@ class GlobalExceptionHandler {
 
         StringBuilder sb = new StringBuilder();
 
-        Interaction interaction = new Interaction();
-        interaction.setCode(Interaction.CodeEnum.ABORT);
-        interaction.setReason(Interaction.ReasonEnum.BLOCKED);
-
-        ErrorInfo info = new ErrorInfo();
-        info.setResultInfo(sb.toString());
-        info.setInteraction(interaction);
-
         List<String> errors = e.getViolations().stream()
                 .map(v -> v.getPropertyPath().toString() + " " + v.getMessage())
                 .collect(Collectors.toList());
 
         errors.forEach( err -> sb.append(err).append(", "));
-        info.setResultInfo("Errors: " + sb.replace(sb.length()-2, sb.length(), "").toString());
+        ErrorInfo info = new ErrorInfo("Errors: " + sb.replace(sb.length()-2, sb.length(), "").toString());
 
         return ResponseEntity.status(status.value()).body(info);
+    }
+
+    @ExceptionHandler({UnknownHostException.class})
+    public ResponseEntity handle(UnknownHostException e){
+        ErrorInfo info = new ErrorInfo(e.getMessage());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(info);
     }
 
 }

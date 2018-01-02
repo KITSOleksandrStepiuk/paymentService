@@ -7,16 +7,16 @@ import com.kingfisher.payment.api.database.service.TransactionLogService;
 import com.kingfisher.payment.api.error.InputDTOValidationException;
 import com.kingfisher.payment.api.model.ListRequestDTO;
 import com.kingfisher.payment.api.optile.error.model.ErrorResponse;
-import com.kingfisher.payment.api.optile.model.*;
+import com.kingfisher.payment.api.optile.model.NetworkList;
+import com.kingfisher.payment.api.optile.model.Operation;
+import com.kingfisher.payment.api.optile.model.Payout;
+import com.kingfisher.payment.api.optile.model.Transaction;
 import com.kingfisher.payment.api.optile.service.OptileService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.dozer.DozerBeanMapper;
-import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -24,8 +24,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
-import javax.validation.constraints.NotNull;
-import java.net.UnknownHostException;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
@@ -45,14 +43,6 @@ public class PaymentAPI {
     private DozerBeanMapper dozerBeanMapper;
     @Autowired
     private Validator validator;
-    @Autowired
-    Environment environment;
-    @Value("${optile.DTO.transaction.integration.mode}")
-    private String integrationMode;
-    @Value("${optile.DTO.transaction.updateOnly}")
-    private boolean updateOnly;
-    @Value("${otile.notification.url}")
-    private String notificationUrl;
 
     @ApiOperation(value = "Create Payment session for new transaction")
     @ApiResponses({
@@ -73,14 +63,14 @@ public class PaymentAPI {
         }
 
         Transaction transaction = dozerBeanMapper.map(request, Transaction.class);
-        populateTransactionWithStaticDataAndGenerateTransactionId(transaction, request.getOrderId());
+        transactionLogService.populateTransactionWithOptileStaticDataAndGenerateTransactionId(transaction, request.getOrderId());
 
         Optional<CustomerRegistrationInfo> registrationInfo = customerService.getCustomerRegistrationInfo(request.getCustomer().getNumber());
-        registrationInfo.ifPresent(regInfo -> populateRequestWithCustomerRegistrationInfo(regInfo, transaction));
+        registrationInfo.ifPresent(regInfo -> customerService.populateRequestWithCustomerRegistrationInfo(regInfo, transaction));
 
         NetworkList response = optileService.postListRequest(transaction);
 
-        initAndSaveNewTransactionLogInfo(transaction, response, request.getOrderId(), registrationInfo);
+        transactionLogService.initAndSaveNewTransactionLogInfo(transaction, response, request.getOrderId(), registrationInfo);
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
@@ -129,7 +119,7 @@ public class PaymentAPI {
         transactionLogInfo.ifPresent(trnLogInfo -> {
             if (trnLogInfo.getCustomerRegistrationInfo().getProfileId().equalsIgnoreCase(profileId)){
                 payout.set(optileService.chargePayment(trnLogInfo.getListId(), operation));
-                saveCustomerRegistrationInfo(payout.get());
+                customerService.saveCustomerRegistrationInfo(payout.get());
             }
 
         });
@@ -162,85 +152,8 @@ public class PaymentAPI {
     @DeleteMapping(
             path = "/session/cancel/{listId}")
     public ResponseEntity closePaymentCharge(@PathVariable("listId") String listId) {
-        ResponseEntity entity = optileService.cancelListSession(listId);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
-
-
-    private void populateTransactionWithStaticDataAndGenerateTransactionId(Transaction transaction, String orderId) {
-        transaction.setIntegration(Transaction.IntegrationEnum.fromValue(integrationMode));
-        transaction.setTransactionId(generateTransactionId(orderId, transaction.getCustomer().getNumber()));
-        transaction.setUpdateOnly(updateOnly);
-        transaction.getCallback().setNotificationUrl(notificationUrl);
-    }
-
-    private String generateTransactionId(@NotNull String orderId, @NotNull String custromerId) {
-
-        return new StringBuilder()
-                .append(DateTime.now().getMillis())
-                .append("-")
-                .append(orderId)
-                .append("-")
-                .append(custromerId).toString();
-
-    }
-
-    private void populateRequestWithCustomerRegistrationInfo(CustomerRegistrationInfo registrationInfo, Transaction transactionRequest) {
-        Registration registration = new Registration();
-        registration.setId(registrationInfo.getOptileCustomerId());
-        registration.setPassword(registrationInfo.getOptileCustomerPassword());
-        transactionRequest.getCustomer().setRegistration(registration);
-    }
-
-    private void initAndSaveNewTransactionLogInfo(Transaction request, NetworkList response, String orderId, Optional<CustomerRegistrationInfo> registrationInfo) {
-
-        CustomerRegistrationInfo customerRegistrationInfo;
-
-        if(!registrationInfo.isPresent()) {
-            customerRegistrationInfo = new CustomerRegistrationInfo(request.getCustomer().getNumber());
-        }else {
-            customerRegistrationInfo = registrationInfo.get();
-        }
-
-        TransactionLogInfo transactionLogInfo = new TransactionLogInfo();
-        transactionLogInfo.setTimestamp(DateTime.now().getMillis());
-        transactionLogInfo.setCustomerRegistrationInfo(customerRegistrationInfo);
-        transactionLogInfo.setTransactionId(response.getIdentification().getTransactionId());
-        transactionLogInfo.setListId(response.getIdentification().getLongId());
-        transactionLogInfo.setOrderId(orderId);
-
-        transactionLogService.saveOrUpdateTransaction(transactionLogInfo);
-    }
-
-    private void saveCustomerRegistrationInfo(Payout response) {
-        response.getRedirect()
-                .getParameters()
-                .stream()
-                .filter( p -> p.getName().equals("customerRegistrationId"))
-                .findFirst()
-                .ifPresent( customerRegId -> {
-                    transactionLogService.getTransactionLogById(response.getIdentification().getTransactionId())
-                            .ifPresent(transactionLogInfo -> {
-                                transactionLogInfo.getCustomerRegistrationInfo().setOptileCustomerId(customerRegId.getValue());
-                                transactionLogInfo.getCustomerRegistrationInfo().setOptileCustomerPassword("password1");
-                                transactionLogInfo.setChargeId(response.getIdentification().getLongId());
-                                transactionLogService.saveOrUpdateTransaction(transactionLogInfo);
-                            });
-                });
-    }
-
-    private boolean isCustomerRegistrationProvided(Transaction request) {
-        Registration registration = request.getCustomer().getRegistration();
-        return registration != null && registration.getId() != null;
-    }
-
-
-
-    @ExceptionHandler({UnknownHostException.class})
-    public ResponseEntity handle(Exception e){
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-    }
-
 
 }
 

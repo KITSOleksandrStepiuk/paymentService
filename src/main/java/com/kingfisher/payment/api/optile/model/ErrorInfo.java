@@ -1,13 +1,11 @@
 package com.kingfisher.payment.api.optile.model;
 
-import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import com.kingfisher.payment.api.optile.model.Interaction;
+
 import javax.validation.Valid;
-import javax.validation.constraints.*;
+import javax.validation.constraints.NotNull;
+import java.util.Objects;
 
 /**
  * ErrorInfo
@@ -20,6 +18,17 @@ public class ErrorInfo   {
 
   @JsonProperty("interaction")
   private Interaction interaction = null;
+
+  public ErrorInfo() {}
+
+  public ErrorInfo(String reason) {
+    Interaction interaction = new Interaction();
+    interaction.setCode(Interaction.CodeEnum.ABORT);
+    interaction.setReason(Interaction.ReasonEnum.BLOCKED);
+
+    this.setInteraction(interaction);
+    this.setResultInfo(reason);
+  }
 
   public ErrorInfo resultInfo(String resultInfo) {
     this.resultInfo = resultInfo;
@@ -103,5 +112,6 @@ public class ErrorInfo   {
     }
     return o.toString().replace("\n", "\n    ");
   }
+
 }
 
