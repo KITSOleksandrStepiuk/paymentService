@@ -4,7 +4,7 @@
 
 1) Clone repository
 
-2) Open project (do not forget to select Use Default Gradle wrapper. Gradle v4.0 is used in project, while default Idea wrapper is < 4)
+2) Open project (do not forget to select Use Default Gradle wrapper. Gradle v4.0 is used in project, while default Idea wrapper is < 4). Appointment: in Idea (File -> Settings) Gradle settings change java version to 1.8.
 
 3) Install Docker
 https://docs.docker.com/engine/installation/linux/docker-ce/ubuntu/#install-using-the-repository

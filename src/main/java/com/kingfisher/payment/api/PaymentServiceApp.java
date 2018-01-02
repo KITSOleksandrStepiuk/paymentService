@@ -4,6 +4,7 @@ import com.kingfisher.payment.api.config.*;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Import;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 @SpringBootApplication
@@ -15,6 +16,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
         DozerConfig.class
 })
 @EnableSwagger2
+@EnableTransactionManagement
 public class PaymentServiceApp {
 
     public static void main(String[] args) {

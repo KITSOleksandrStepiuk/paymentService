@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiModelProperty;
 import org.joda.time.LocalDate;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.Objects;
 
@@ -48,7 +49,7 @@ public class Customer   {
   **/
   @ApiModelProperty(required = true, value = "Identifier for this customer given by the merchant; not validated for uniqueness by OPG")
   @NotNull
-
+  @NotEmpty
 
   public String getNumber() {
     return number;

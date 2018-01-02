@@ -1,5 +1,5 @@
 {
-  "resultInfo":"Errors: payment must not be null, callback must not be null, country must not be null, customer must not be null",
+  "resultInfo":"Errors: callback must not be null, country must not be null, customer must not be null, orderId must not be empty, orderId must not be null, payment must not be null",
   "interaction":
   {
     "code":"ABORT",

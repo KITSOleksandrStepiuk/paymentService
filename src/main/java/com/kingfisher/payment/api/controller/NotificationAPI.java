@@ -1,10 +1,12 @@
 package com.kingfisher.payment.api.controller;
 
-import com.kingfisher.payment.api.optile.error.model.ErrorResponse;
+import com.kingfisher.payment.api.optile.model.ErrorInfo;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,12 +17,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/notification")
 public class NotificationAPI {
 
+    private final Logger logger = LoggerFactory.getLogger(NotificationAPI.class);
+
     @ApiOperation(value = "Accept Optile notification", response = String.class)
     @ApiResponses({
-            @ApiResponse(code =  404, message ="Not found", response = ErrorResponse.class),
-            @ApiResponse(code =  400, message ="Invalid input", response = ErrorResponse.class),
+            @ApiResponse(code =  404, message ="Not found", response = ErrorInfo.class),
+            @ApiResponse(code =  400, message ="Invalid input", response = ErrorInfo.class),
             @ApiResponse(code =  200, message ="Notification accepted"),
-            @ApiResponse(code =  503, message ="Server Internal Error", response = ErrorResponse.class)
+            @ApiResponse(code =  503, message ="Server Internal Error", response = ErrorInfo.class)
     })
     @GetMapping()
     public ResponseEntity getOptileNotification(@RequestParam String transactionId,
@@ -52,6 +56,7 @@ public class NotificationAPI {
                                                 @RequestParam(required = false) DateTime autoRetryAfter,
                                                 @RequestParam(required = false) Integer rejectionCount) {
         //TODO implement notification handling
+        logger.debug("notification received for transactionID: " + transactionId);
         return ResponseEntity.ok().build();
     }
 

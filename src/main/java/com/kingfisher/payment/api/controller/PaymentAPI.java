@@ -6,16 +6,14 @@ import com.kingfisher.payment.api.database.service.CustomerService;
 import com.kingfisher.payment.api.database.service.TransactionLogService;
 import com.kingfisher.payment.api.error.InputDTOValidationException;
 import com.kingfisher.payment.api.model.ListRequestDTO;
-import com.kingfisher.payment.api.optile.error.model.ErrorResponse;
-import com.kingfisher.payment.api.optile.model.NetworkList;
-import com.kingfisher.payment.api.optile.model.Operation;
-import com.kingfisher.payment.api.optile.model.Payout;
-import com.kingfisher.payment.api.optile.model.Transaction;
+import com.kingfisher.payment.api.optile.model.*;
 import com.kingfisher.payment.api.optile.service.OptileService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.dozer.DozerBeanMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -33,6 +31,8 @@ import java.util.concurrent.atomic.AtomicReference;
 @RequestMapping("api/v1/payment")
 public class PaymentAPI {
 
+    private final Logger logger = LoggerFactory.getLogger(PaymentAPI.class);
+
     @Autowired
     private OptileService optileService;
     @Autowired
@@ -46,15 +46,18 @@ public class PaymentAPI {
 
     @ApiOperation(value = "Create Payment session for new transaction")
     @ApiResponses({
-            @ApiResponse(code =  404, message ="Not found", response = ErrorResponse.class),
-            @ApiResponse(code =  400, message ="Invalid input", response = ErrorResponse.class),
-            @ApiResponse(code =  503, message ="Server Internal Error", response = ErrorResponse.class)
+            @ApiResponse(code =  200, message ="List response with possible payment networks"),
+            @ApiResponse(code =  422, message ="Invalid input", response = ErrorInfo.class),
+            @ApiResponse(code =  401, message ="Request is not authorized, wrong authentication token or missing payment role", response = ErrorInfo.class),
+            @ApiResponse(code =  500, message ="Internal server error", response = ErrorInfo.class)
     })
     @PostMapping(
             path="/session/create",
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<NetworkList> createPaymentSession(@RequestBody ListRequestDTO request) throws InputDTOValidationException {
+
+        logger.debug("createPaymentSession(). OrderId: {}, Request Body: {}" , request.getOrderId(), request);
 
         Set<ConstraintViolation<ListRequestDTO>> violations = validator.validate(request);
 
@@ -72,14 +75,16 @@ public class PaymentAPI {
 
         transactionLogService.initAndSaveNewTransactionLogInfo(transaction, response, request.getOrderId(), registrationInfo);
 
+        logger.debug("createPaymentSession(). OrderId: {}, Transaction: {} END." , request.getOrderId(), transaction.getTransactionId());
+
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @ApiOperation(value = "Close session transaction from ATG")
     @ApiResponses({
-            @ApiResponse(code =  404, message ="Not found", response = ErrorResponse.class),
-            @ApiResponse(code =  400, message ="Invalid input", response = ErrorResponse.class),
-            @ApiResponse(code =  503, message ="Server Internal Error", response = ErrorResponse.class)
+            @ApiResponse(code =  404, message ="Not found", response = ErrorInfo.class),
+            @ApiResponse(code =  400, message ="Invalid input", response = ErrorInfo.class),
+            @ApiResponse(code =  503, message ="Server Internal Error", response = ErrorInfo.class)
     })
     @PostMapping(
             path = "/session/close/{profileId}/{orderId}",
@@ -102,7 +107,7 @@ public class PaymentAPI {
 
     @ApiOperation(value = "Charge payment from ATG")
     @ApiResponses({
-            @ApiResponse(code =  503, message ="Server Internal Error", response = ErrorResponse.class)
+            @ApiResponse(code =  503, message ="Server Internal Error", response = ErrorInfo.class)
     })
     @PostMapping(
             path = "/session/charge/{profileId}/{orderId}",
@@ -130,9 +135,9 @@ public class PaymentAPI {
     //TODO refactor like chargePayment with input parameters order or profileId or both.
     @ApiOperation(value = "Refund payment")
     @ApiResponses({
-            @ApiResponse(code =  404, message ="Not found", response = ErrorResponse.class),
-            @ApiResponse(code =  400, message ="Invalid input", response = ErrorResponse.class),
-            @ApiResponse(code =  503, message ="Server Internal Error", response = ErrorResponse.class)
+            @ApiResponse(code =  404, message ="Not found", response = ErrorInfo.class),
+            @ApiResponse(code =  400, message ="Invalid input", response = ErrorInfo.class),
+            @ApiResponse(code =  503, message ="Server Internal Error", response = ErrorInfo.class)
     })
     @PostMapping(
             path = "/session/refund/{chargeId}",
@@ -145,9 +150,9 @@ public class PaymentAPI {
 
     @ApiOperation(value = "Cancel session transaction")
     @ApiResponses({
-            @ApiResponse(code =  404, message ="Not found", response = ErrorResponse.class),
-            @ApiResponse(code =  400, message ="Invalid input", response = ErrorResponse.class),
-            @ApiResponse(code =  503, message ="Server Internal Error", response = ErrorResponse.class)
+            @ApiResponse(code =  404, message ="Not found", response = ErrorInfo.class),
+            @ApiResponse(code =  400, message ="Invalid input", response = ErrorInfo.class),
+            @ApiResponse(code =  503, message ="Server Internal Error", response = ErrorInfo.class)
     })
     @DeleteMapping(
             path = "/session/cancel/{listId}")

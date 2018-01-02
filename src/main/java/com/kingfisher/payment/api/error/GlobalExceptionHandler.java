@@ -34,19 +34,30 @@ class GlobalExceptionHandler {
     }
 
     @ExceptionHandler({ErrorResponseException.class})
-    public ResponseEntity handle(ErrorResponseException e){
+    public ResponseEntity handle(ErrorResponseException e) {
+        final ErrorInfo errorInfo;
+
         try {
-            final ErrorInfo info = objectMapper.readValue(e.getErrorResponse().getDetails(), ErrorInfo.class);
-            return ResponseEntity.status(e.getErrorResponse().getStatus()).body(info);
-        } catch (IOException e1) {
-            e1.printStackTrace();
+
+            if(e.getErrorResponse().getStatus() == 404) {
+                return ResponseEntity.status(e.getErrorResponse().getStatus()).build();
+            }
+
+            errorInfo = objectMapper.readValue(e.getErrorResponse().getDetails(), ErrorInfo.class);
+
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                 .body(new ErrorInfo(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()));
         }
-        return ResponseEntity.status(e.getErrorResponse().getStatus()).body(e.getErrorResponse().getDetails());
+
+        return ResponseEntity.status(e.getErrorResponse().getStatus()).body(errorInfo);
     }
 
     @ExceptionHandler({ResourceAccessException.class})
     public ResponseEntity handle(ResourceAccessException e){
         HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+
         if(rules.containsKey(e.getCause().getClass())) {
             status = rules.get(e.getCause().getClass());
         }
@@ -58,18 +69,17 @@ class GlobalExceptionHandler {
 
     @ExceptionHandler({InputDTOValidationException.class})
     public ResponseEntity handle(InputDTOValidationException e){
-        HttpStatus status = HttpStatus.BAD_REQUEST;
-
         StringBuilder sb = new StringBuilder();
 
         List<String> errors = e.getViolations().stream()
                 .map(v -> v.getPropertyPath().toString() + " " + v.getMessage())
+                .sorted()
                 .collect(Collectors.toList());
 
         errors.forEach( err -> sb.append(err).append(", "));
         ErrorInfo info = new ErrorInfo("Errors: " + sb.replace(sb.length()-2, sb.length(), "").toString());
 
-        return ResponseEntity.status(status.value()).body(info);
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(info);
     }
 
     @ExceptionHandler({UnknownHostException.class})

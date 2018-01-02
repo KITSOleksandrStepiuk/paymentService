@@ -102,8 +102,8 @@ public class PaymentAPITest {
         verify(optileService).postListRequest(optileServiceTransactionCaptor.capture());
         Registration registration = optileServiceTransactionCaptor.getValue().getCustomer().getRegistration();
 
-        assertEquals(registration.getId(), OPTILE_CUSTOMER_ID);
-        assertEquals(registration.getPassword(), OPTILE_PASSWORD);
+        assertEquals(OPTILE_CUSTOMER_ID, registration.getId());
+        assertEquals(OPTILE_PASSWORD, registration.getPassword());
 
     }
 
@@ -131,7 +131,7 @@ public class PaymentAPITest {
         given(optileService.postListRequest(any(Transaction.class))).willReturn(networkList);
 
         mvc.perform(post(URL_BASE+"/session/create").contentType(MediaType.APPLICATION_JSON).content(input))
-                .andExpect(status().is(400))
+                .andExpect(status().is(422))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(content().json(output));
 
