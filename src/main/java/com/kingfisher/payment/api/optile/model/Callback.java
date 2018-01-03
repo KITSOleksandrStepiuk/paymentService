@@ -2,6 +2,7 @@ package com.kingfisher.payment.api.optile.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.kingfisher.payment.api.validator.annotation.DisallowedField;
+import com.kingfisher.payment.api.validator.groups.PaymentAPI;
 import io.swagger.annotations.ApiModelProperty;
 
 import javax.validation.constraints.NotNull;
@@ -23,7 +24,7 @@ public class Callback   {
   private String cancelUrl = null;
 
   @JsonProperty("notificationUrl")
-  @DisallowedField
+  @DisallowedField(groups = {PaymentAPI.class})
   private String notificationUrl = null;
 
   public Callback returnUrl(String returnUrl) {

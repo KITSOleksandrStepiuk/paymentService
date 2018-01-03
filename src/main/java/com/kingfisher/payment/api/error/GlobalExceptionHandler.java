@@ -2,7 +2,10 @@ package com.kingfisher.payment.api.error;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kingfisher.payment.api.optile.model.ErrorInfo;
+import com.kingfisher.payment.api.validator.ValidatorUtil;
 import org.apache.http.conn.ConnectTimeoutException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
@@ -23,10 +26,14 @@ import java.util.stream.Collectors;
 @ControllerAdvice
 class GlobalExceptionHandler {
 
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+
     @Autowired
     private ObjectMapper objectMapper;
+    @Autowired
+    private ValidatorUtil validatorUtil;
 
-    private Map<Class<? extends Throwable>, HttpStatus> rules = new HashMap<>();
+    private final Map<Class<? extends Throwable>, HttpStatus> rules = new HashMap<>();
 
     {
         rules.put(ConnectTimeoutException.class, HttpStatus.REQUEST_TIMEOUT);
@@ -35,6 +42,8 @@ class GlobalExceptionHandler {
 
     @ExceptionHandler({ErrorResponseException.class})
     public ResponseEntity handle(ErrorResponseException e) {
+        logger.trace("Processing: {}", e.getStackTrace());
+
         final ErrorInfo errorInfo;
 
         try {
@@ -55,7 +64,9 @@ class GlobalExceptionHandler {
     }
 
     @ExceptionHandler({ResourceAccessException.class})
-    public ResponseEntity handle(ResourceAccessException e){
+    public ResponseEntity handle(ResourceAccessException e) {
+        logger.trace("Processing: {}", e.getStackTrace());
+
         HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
 
         if(rules.containsKey(e.getCause().getClass())) {
@@ -68,22 +79,18 @@ class GlobalExceptionHandler {
     }
 
     @ExceptionHandler({InputDTOValidationException.class})
-    public ResponseEntity handle(InputDTOValidationException e){
-        StringBuilder sb = new StringBuilder();
+    public ResponseEntity handle(InputDTOValidationException e) {
+        logger.trace("Processing: {}", e.getStackTrace());
 
-        List<String> errors = e.getViolations().stream()
-                .map(v -> v.getPropertyPath().toString() + " " + v.getMessage())
-                .sorted()
-                .collect(Collectors.toList());
-
-        errors.forEach( err -> sb.append(err).append(", "));
-        ErrorInfo info = new ErrorInfo("Errors: " + sb.replace(sb.length()-2, sb.length(), "").toString());
+        ErrorInfo info = new ErrorInfo("Errors: " + validatorUtil.collectViolations(e.getViolations()));
 
         return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(info);
     }
 
     @ExceptionHandler({UnknownHostException.class})
     public ResponseEntity handle(UnknownHostException e){
+        logger.trace("Processing: {}", e.getStackTrace());
+
         ErrorInfo info = new ErrorInfo(e.getMessage());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(info);
     }

@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import javax.validation.Validator;
 import java.text.MessageFormat;
 
 @Service
@@ -38,50 +39,38 @@ public class OptileService {
     private String acceptHeader;
 
     @Autowired
-    private RestTemplate restTemplate;
-
+    private RestTemplateExtension restTemplateExtention;
 
     public NetworkList postListRequest(final Transaction listRequest) {
 
         HttpEntity<Transaction> entity = new HttpEntity<>(listRequest, getHeaders());
 
-        return restTemplate.postForObject(
-                baseURL + listEndpoint,
-                entity,
-                NetworkList.class);
+        return restTemplateExtention.execute(NetworkList.class,baseURL + listEndpoint, HttpMethod.POST, entity).getBody();
     }
 
     public Payout closePaymentCharge(String chargeId, Transaction transaction) {
 
         HttpEntity<Transaction> entity = new HttpEntity<>(transaction, getHeaders());
 
-        return restTemplate.postForObject(
-                baseURL + MessageFormat.format(closeChargeEndpoint, chargeId),
-                entity,
-                Payout.class);
+        return restTemplateExtention.execute(Payout.class,baseURL + MessageFormat.format(closeChargeEndpoint, chargeId), HttpMethod.POST, entity).getBody();
     }
 
     public Payout chargePayment(String listId, Operation operation) {
         HttpEntity<Operation> entity = new HttpEntity<>(operation, getHeaders());
 
-        return restTemplate.postForObject(
-                baseURL +MessageFormat.format(chargePaymentEndpoint, listId),
-                entity,
-                Payout.class);
+        return restTemplateExtention.execute(Payout.class,baseURL + MessageFormat.format(chargePaymentEndpoint, listId), HttpMethod.POST, entity).getBody();
     }
 
     public Payout refundPayment(String listId, Operation operation) {
        HttpEntity<Operation> entity = new HttpEntity<>(operation, getHeaders());
 
-       return restTemplate.postForObject(
-                baseURL +MessageFormat.format(refundChargeEndpoint, listId),
-                entity,
-                Payout.class);
+        return restTemplateExtention.execute(Payout.class,baseURL + MessageFormat.format(refundChargeEndpoint, listId), HttpMethod.POST, entity).getBody();
     }
 
     public ResponseEntity cancelListSession(String listId) {
         HttpEntity<Operation> entity = new HttpEntity<>(getHeaders());
-        return restTemplate.exchange(baseURL+MessageFormat.format(cancelListSessionEndpoint, listId), HttpMethod.DELETE, entity, Void.class);
+
+        return restTemplateExtention.execute(Payout.class,baseURL+MessageFormat.format(cancelListSessionEndpoint, listId), HttpMethod.DELETE, entity);
     }
 
     //TODO authorization token will be different and dynamic in future. Below is for Test Optile sandbox.

@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.kingfisher.payment.api.validator.annotation.DisallowedField;
+import com.kingfisher.payment.api.validator.groups.Optile;
+import com.kingfisher.payment.api.validator.groups.PaymentAPI;
 import io.swagger.annotations.ApiModelProperty;
 
 import javax.validation.Valid;
@@ -55,11 +57,11 @@ public class Transaction {
   }
 
   @JsonProperty("integration")
-  @DisallowedField
+  @DisallowedField(groups = {PaymentAPI.class})
   private IntegrationEnum integration = null;
 
   @JsonProperty("transactionId")
-  @DisallowedField
+  @DisallowedField(groups = {PaymentAPI.class})
   private String transactionId = null;
 
   @JsonProperty("country")
@@ -141,7 +143,7 @@ public class Transaction {
   private List<Product> products = null;
 
   @JsonProperty("updateOnly")
-  @DisallowedField
+  @DisallowedField(groups = {PaymentAPI.class})
   private Boolean updateOnly = null;
 
   @JsonProperty("presetFirst")
@@ -192,7 +194,7 @@ public class Transaction {
    * @return transactionId
   **/
   @ApiModelProperty(example = "O-000016565/0176", required = false, value = "Identifier for this transaction given by the merchant; it is not validated for uniqueness by OPG, but may be checked for by some PSPs, thus recommended to be unique ")
-
+  @NotNull(groups = {Optile.class})
 
 
   public String getTransactionId() {

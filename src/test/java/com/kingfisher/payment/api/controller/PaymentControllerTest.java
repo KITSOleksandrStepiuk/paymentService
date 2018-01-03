@@ -1,6 +1,7 @@
 package com.kingfisher.payment.api.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kingfisher.payment.api.config.PropertiesConfig;
 import com.kingfisher.payment.api.database.model.CustomerRegistrationInfo;
 import com.kingfisher.payment.api.database.service.CustomerService;
 import com.kingfisher.payment.api.database.service.TransactionLogService;
@@ -8,12 +9,16 @@ import com.kingfisher.payment.api.optile.model.NetworkList;
 import com.kingfisher.payment.api.optile.model.Registration;
 import com.kingfisher.payment.api.optile.model.Transaction;
 import com.kingfisher.payment.api.optile.service.OptileService;
+import com.kingfisher.payment.api.validator.ValidatorUtil;
+import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -52,8 +57,15 @@ public class PaymentControllerTest {
     private CustomerService customerService;
     @MockBean
     private TransactionLogService transactionLogService;
+    @MockBean
+    private ValidatorUtil validatorUtil;
     @Captor
     ArgumentCaptor<Transaction> optileServiceTransactionCaptor;
+
+    @Before
+    public void before() {
+        doCallRealMethod().when(validatorUtil).collectViolations(any());
+    }
 
     @Test
     public void createPaymentSessionForNewCustomerTest() throws Exception {
@@ -68,7 +80,7 @@ public class PaymentControllerTest {
         given(optileService.postListRequest(any(Transaction.class))).willReturn(networkList);
 
         mvc.perform(post(URL_BASE+"/session/create").contentType(MediaType.APPLICATION_JSON).content(input))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(content().json(output));
 
@@ -94,7 +106,7 @@ public class PaymentControllerTest {
         doCallRealMethod().when(customerService).populateRequestWithCustomerRegistrationInfo(customerRegistrationInfo, transaction);
 
         mvc.perform(post(URL_BASE+"/session/create").contentType(MediaType.APPLICATION_JSON).content(input))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(content().json(output));
 
@@ -107,7 +119,7 @@ public class PaymentControllerTest {
     }
 
     @Test
-    public void missingMandatoryFieldsWhileCratePaymentSession() throws Exception {
+    public void missingMandatoryFieldsWhileCreatePaymentSession() throws Exception {
 
         given(customerService.getCustomerRegistrationInfo(PROFILE_ID)).willReturn(Optional.empty());
 

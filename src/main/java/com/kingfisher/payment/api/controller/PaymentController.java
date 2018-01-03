@@ -8,6 +8,8 @@ import com.kingfisher.payment.api.error.InputDTOValidationException;
 import com.kingfisher.payment.api.model.ListRequestDTO;
 import com.kingfisher.payment.api.optile.model.*;
 import com.kingfisher.payment.api.optile.service.OptileService;
+import com.kingfisher.payment.api.validator.groups.Optile;
+import com.kingfisher.payment.api.validator.groups.PaymentAPI;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -19,9 +21,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.ConstraintViolation;
+import javax.validation.Valid;
 import javax.validation.Validator;
 import java.util.Optional;
 import java.util.Set;
@@ -47,7 +51,7 @@ public class PaymentController {
 
     @ApiOperation(value = "Create Payment session for new transaction")
     @ApiResponses({
-            @ApiResponse(code =  200, message ="List response with possible payment networks"),
+            @ApiResponse(code =  201, message ="List response with possible payment networks"),
             @ApiResponse(code =  422, message ="Invalid input", response = ErrorInfo.class),
             @ApiResponse(code =  401, message ="Request is not authorized, wrong authentication token or missing payment role", response = ErrorInfo.class),
             @ApiResponse(code =  500, message ="Internal server error", response = ErrorInfo.class)
@@ -60,7 +64,7 @@ public class PaymentController {
 
         logger.debug("createPaymentSession(). OrderId: {}, Request Body: {}" , request.getOrderId(), request);
 
-        Set<ConstraintViolation<ListRequestDTO>> violations = validator.validate(request);
+        Set<ConstraintViolation<ListRequestDTO>> violations = validator.validate(request, PaymentAPI.class);
 
         if(!violations.isEmpty()) {
             throw new InputDTOValidationException(violations);
@@ -78,7 +82,7 @@ public class PaymentController {
 
         logger.debug("createPaymentSession(). OrderId: {}, Transaction: {} END." , request.getOrderId(), transaction.getTransactionId());
 
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @ApiOperation(value = "Close session transaction from ATG")

@@ -2,6 +2,7 @@ package com.kingfisher.payment.api.optile.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.kingfisher.payment.api.validator.annotation.DisallowedField;
+import com.kingfisher.payment.api.validator.groups.PaymentAPI;
 import io.swagger.annotations.ApiModelProperty;
 import org.joda.time.LocalDate;
 
@@ -35,7 +36,7 @@ public class Customer   {
   private Phones phones = null;
 
   @JsonProperty("registration")
-  @DisallowedField
+  @DisallowedField(groups = {PaymentAPI.class})
   private Registration registration = null;
 
   public Customer number(String number) {
@@ -49,7 +50,7 @@ public class Customer   {
   **/
   @ApiModelProperty(required = true, value = "Identifier for this customer given by the merchant; not validated for uniqueness by OPG")
   @NotNull
-  @NotEmpty
+  @NotEmpty(groups = {PaymentAPI.class})
 
   public String getNumber() {
     return number;

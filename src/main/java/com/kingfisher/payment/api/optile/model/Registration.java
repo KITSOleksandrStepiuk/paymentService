@@ -1,8 +1,10 @@
 package com.kingfisher.payment.api.optile.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.kingfisher.payment.api.validator.groups.Optile;
 import io.swagger.annotations.ApiModelProperty;
 
+import javax.validation.constraints.NotNull;
 import java.util.Objects;
 
 /**
@@ -28,6 +30,7 @@ public class Registration   {
    * @return id
   **/
   @ApiModelProperty(example = "59e07b240bd6e05fe60f063au", required = false, value = "Customer registration ID within OPG platform; generated and supplied to merchant when a customer gets registered in OPG")
+  @NotNull(groups = {Optile.class})
 
   public String getId() {
     return id;
