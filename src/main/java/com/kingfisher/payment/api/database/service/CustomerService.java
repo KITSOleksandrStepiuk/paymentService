@@ -29,8 +29,6 @@ public class CustomerService {
         transactionRequest.getCustomer().setRegistration(registration);
     }
 
-
-
     public void saveCustomerRegistrationInfo(Payout response) {
         response.getRedirect()
                 .getParameters()

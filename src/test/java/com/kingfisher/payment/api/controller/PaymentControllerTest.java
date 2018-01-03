@@ -27,16 +27,16 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
-@WebMvcTest(value = PaymentAPI.class)
-public class PaymentAPITest {
+@WebMvcTest(value = PaymentController.class)
+public class PaymentControllerTest {
 
-    private static final String URL_BASE = "/api/v1/payment";
+    private static final String URL_BASE = "";
     private static final String PROFILE_ID = "profileId";
     private static final String OPTILE_CUSTOMER_ID = "optileCustomerId";
     private static final String OPTILE_PASSWORD = "optilePassword";
@@ -63,12 +63,9 @@ public class PaymentAPITest {
         String input = StreamUtils.copyToString(this.getClass().getClassLoader().getResourceAsStream("expectedJson/optileListRequestInput.json"), Charset.defaultCharset());
         String output = StreamUtils.copyToString(this.getClass().getClassLoader().getResourceAsStream("expectedJson/optileListRequestOutput.json"), Charset.defaultCharset());
 
-        Transaction transaction = objectMapper.readValue(input, Transaction.class);
         NetworkList networkList = objectMapper.readValue(output, NetworkList.class);
 
-
         given(optileService.postListRequest(any(Transaction.class))).willReturn(networkList);
-
 
         mvc.perform(post(URL_BASE+"/session/create").contentType(MediaType.APPLICATION_JSON).content(input))
                 .andExpect(status().isOk())
@@ -89,10 +86,12 @@ public class PaymentAPITest {
         String input = StreamUtils.copyToString(this.getClass().getClassLoader().getResourceAsStream("expectedJson/optileListRequestInput.json"), Charset.defaultCharset());
         String output = StreamUtils.copyToString(this.getClass().getClassLoader().getResourceAsStream("expectedJson/optileListRequestOutput.json"), Charset.defaultCharset());
 
+        Transaction transaction = objectMapper.readValue(input, Transaction.class);
         NetworkList networkList = objectMapper.readValue(output, NetworkList.class);
 
         given(customerService.getCustomerRegistrationInfo(anyString())).willReturn(Optional.of(customerRegistrationInfo));
         given(optileService.postListRequest(any(Transaction.class))).willReturn(networkList);
+        doCallRealMethod().when(customerService).populateRequestWithCustomerRegistrationInfo(customerRegistrationInfo, transaction);
 
         mvc.perform(post(URL_BASE+"/session/create").contentType(MediaType.APPLICATION_JSON).content(input))
                 .andExpect(status().isOk())
@@ -110,17 +109,6 @@ public class PaymentAPITest {
     @Test
     public void missingMandatoryFieldsWhileCratePaymentSession() throws Exception {
 
-        /**
-         Transaction:
-             type: object
-             required:
-             - transactionId - generatedBy payment API service
-             - country
-             - callback
-             - customer
-             - payment
-         */
-
         given(customerService.getCustomerRegistrationInfo(PROFILE_ID)).willReturn(Optional.empty());
 
         String input = StreamUtils.copyToString(this.getClass().getClassLoader().getResourceAsStream("expectedJson/missingMandatoryFieldsInput.json"), Charset.defaultCharset());
@@ -134,8 +122,6 @@ public class PaymentAPITest {
                 .andExpect(status().is(422))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(content().json(output));
-
-
 
     }
 }

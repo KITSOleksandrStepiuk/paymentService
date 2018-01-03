@@ -8,6 +8,7 @@ import com.kingfisher.payment.api.error.InputDTOValidationException;
 import com.kingfisher.payment.api.model.ListRequestDTO;
 import com.kingfisher.payment.api.optile.model.*;
 import com.kingfisher.payment.api.optile.service.OptileService;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -28,10 +29,10 @@ import java.util.concurrent.atomic.AtomicReference;
 
 @CrossOrigin
 @RestController
-@RequestMapping("api/v1/payment")
-public class PaymentAPI {
+@Api(tags = {"Payment API"}, description="Payment API")
+public class PaymentController {
 
-    private final Logger logger = LoggerFactory.getLogger(PaymentAPI.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
     private OptileService optileService;
