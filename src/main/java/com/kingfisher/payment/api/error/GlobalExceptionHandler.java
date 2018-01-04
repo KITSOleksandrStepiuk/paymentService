@@ -48,14 +48,15 @@ class GlobalExceptionHandler {
 
         try {
 
-            if(e.getErrorResponse().getStatus() == 404) {
+            // for any Exception without body (404,403 etc)
+            if(e.getErrorResponse().getDetails().length() <= 0) {
                 return ResponseEntity.status(e.getErrorResponse().getStatus()).build();
             }
 
             errorInfo = objectMapper.readValue(e.getErrorResponse().getDetails(), ErrorInfo.class);
 
         } catch (IOException ex) {
-            ex.printStackTrace();
+            logger.trace("Processing: {}", ex.getStackTrace());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                                  .body(new ErrorInfo(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()));
         }

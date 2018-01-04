@@ -19,8 +19,9 @@ public class ApiDocumentationConfiguration {
                     .apis(RequestHandlerSelectors.basePackage("com.kingfisher.payment.api"))
                     .paths(PathSelectors.any())
                 .build()
-                .pathMapping("/")
-                .apiInfo(metadata());
+                    .useDefaultResponseMessages(false)
+                    .pathMapping("/")
+                    .apiInfo(metadata());
     }
 
     private ApiInfo metadata() {

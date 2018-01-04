@@ -19,8 +19,7 @@ import java.text.MessageFormat;
 @Service
 public class OptileService {
 
-    @Value("${optile.api.base.url}")
-    private String baseURL;
+
     @Value("${optile.api.post.list}")
     private String listEndpoint;
     @Value("${optile.api.close.charge}")
@@ -45,32 +44,32 @@ public class OptileService {
 
         HttpEntity<Transaction> entity = new HttpEntity<>(listRequest, getHeaders());
 
-        return restTemplateExtention.execute(NetworkList.class,baseURL + listEndpoint, HttpMethod.POST, entity).getBody();
+        return restTemplateExtention.execute(NetworkList.class,listEndpoint, HttpMethod.POST, entity).getBody();
     }
 
     public Payout closePaymentCharge(String chargeId, Transaction transaction) {
 
         HttpEntity<Transaction> entity = new HttpEntity<>(transaction, getHeaders());
 
-        return restTemplateExtention.execute(Payout.class,baseURL + MessageFormat.format(closeChargeEndpoint, chargeId), HttpMethod.POST, entity).getBody();
+        return restTemplateExtention.execute(Payout.class, MessageFormat.format(closeChargeEndpoint, chargeId), HttpMethod.POST, entity).getBody();
     }
 
     public Payout chargePayment(String listId, Operation operation) {
         HttpEntity<Operation> entity = new HttpEntity<>(operation, getHeaders());
 
-        return restTemplateExtention.execute(Payout.class,baseURL + MessageFormat.format(chargePaymentEndpoint, listId), HttpMethod.POST, entity).getBody();
+        return restTemplateExtention.execute(Payout.class, MessageFormat.format(chargePaymentEndpoint, listId), HttpMethod.POST, entity).getBody();
     }
 
     public Payout refundPayment(String listId, Operation operation) {
        HttpEntity<Operation> entity = new HttpEntity<>(operation, getHeaders());
 
-        return restTemplateExtention.execute(Payout.class,baseURL + MessageFormat.format(refundChargeEndpoint, listId), HttpMethod.POST, entity).getBody();
+        return restTemplateExtention.execute(Payout.class, MessageFormat.format(refundChargeEndpoint, listId), HttpMethod.POST, entity).getBody();
     }
 
     public ResponseEntity cancelListSession(String listId) {
         HttpEntity<Operation> entity = new HttpEntity<>(getHeaders());
 
-        return restTemplateExtention.execute(Payout.class,baseURL+MessageFormat.format(cancelListSessionEndpoint, listId), HttpMethod.DELETE, entity);
+        return restTemplateExtention.execute(Payout.class, MessageFormat.format(cancelListSessionEndpoint, listId), HttpMethod.DELETE, entity);
     }
 
     //TODO authorization token will be different and dynamic in future. Below is for Test Optile sandbox.

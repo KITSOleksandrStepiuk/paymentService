@@ -48,7 +48,6 @@ public class PaymentController {
 
     @ApiOperation(value = "Create Payment session for new transaction", nickname = "createPaymentSession")
     @ApiResponses({
-            @ApiResponse(code =  201, message ="List response with possible payment networks"),
             @ApiResponse(code =  422, message ="Invalid input", response = ErrorInfo.class),
             @ApiResponse(code =  401, message ="Request is not authorized, wrong authentication token or missing payment role", response = ErrorInfo.class),
             @ApiResponse(code =  500, message ="Internal server error", response = ErrorInfo.class)
