@@ -67,3 +67,8 @@ dependencies {
     compile("io.springfox:springfox-swagger-ui:2.7.0")
 
 }
+
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '4.0' //version required
+}

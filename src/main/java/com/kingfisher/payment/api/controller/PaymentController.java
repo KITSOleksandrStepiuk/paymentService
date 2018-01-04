@@ -8,7 +8,6 @@ import com.kingfisher.payment.api.error.InputDTOValidationException;
 import com.kingfisher.payment.api.model.ListRequestDTO;
 import com.kingfisher.payment.api.optile.model.*;
 import com.kingfisher.payment.api.optile.service.OptileService;
-import com.kingfisher.payment.api.validator.groups.Optile;
 import com.kingfisher.payment.api.validator.groups.PaymentAPI;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -21,11 +20,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.ConstraintViolation;
-import javax.validation.Valid;
 import javax.validation.Validator;
 import java.util.Optional;
 import java.util.Set;
@@ -49,7 +46,7 @@ public class PaymentController {
     @Autowired
     private Validator validator;
 
-    @ApiOperation(value = "Create Payment session for new transaction")
+    @ApiOperation(value = "Create Payment session for new transaction", nickname = "createPaymentSession")
     @ApiResponses({
             @ApiResponse(code =  201, message ="List response with possible payment networks"),
             @ApiResponse(code =  422, message ="Invalid input", response = ErrorInfo.class),
