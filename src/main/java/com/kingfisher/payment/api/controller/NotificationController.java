@@ -56,7 +56,7 @@ public class NotificationController {
                                                 @RequestParam(required = false) DateTime autoRetryAfter,
                                                 @RequestParam(required = false) Integer rejectionCount) {
         //TODO implement notification handling
-        logger.debug("notification received for transactionID: " + transactionId);
+        logger.debug("notification received for transactionID: {}", transactionId);
         return ResponseEntity.ok().build();
     }
 

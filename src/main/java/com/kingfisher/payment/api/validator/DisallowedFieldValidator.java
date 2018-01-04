@@ -9,7 +9,7 @@ public class DisallowedFieldValidator implements ConstraintValidator<DisallowedF
 
     @Override
     public void initialize(DisallowedField constraintAnnotation) {
-        String s;
+        // no default implementation
     }
 
     @Override

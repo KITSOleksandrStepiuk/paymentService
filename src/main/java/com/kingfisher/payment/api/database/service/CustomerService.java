@@ -1,7 +1,7 @@
 package com.kingfisher.payment.api.database.service;
 
-import com.kingfisher.payment.api.database.repository.CustomerRepository;
 import com.kingfisher.payment.api.database.model.CustomerRegistrationInfo;
+import com.kingfisher.payment.api.database.repository.CustomerRepository;
 import com.kingfisher.payment.api.optile.model.Payout;
 import com.kingfisher.payment.api.optile.model.Registration;
 import com.kingfisher.payment.api.optile.model.Transaction;
@@ -35,15 +35,13 @@ public class CustomerService {
                 .stream()
                 .filter( p -> p.getName().equals("customerRegistrationId"))
                 .findFirst()
-                .ifPresent( customerRegId -> {
-                    transactionLogService.getTransactionLogById(response.getIdentification().getTransactionId())
-                            .ifPresent(transactionLogInfo -> {
-                                transactionLogInfo.getCustomerRegistrationInfo().setOptileCustomerId(customerRegId.getValue());
-                                transactionLogInfo.getCustomerRegistrationInfo().setOptileCustomerPassword("password1");
-                                transactionLogInfo.setChargeId(response.getIdentification().getLongId());
-                                transactionLogService.saveOrUpdateTransaction(transactionLogInfo);
-                            });
-                });
+                .ifPresent( customerRegId -> transactionLogService.getTransactionLogById(response.getIdentification().getTransactionId())
+                        .ifPresent(transactionLogInfo -> {
+                            transactionLogInfo.getCustomerRegistrationInfo().setOptileCustomerId(customerRegId.getValue());
+                            transactionLogInfo.getCustomerRegistrationInfo().setOptileCustomerPassword("password1");
+                            transactionLogInfo.setChargeId(response.getIdentification().getLongId());
+                            transactionLogService.saveOrUpdateTransaction(transactionLogInfo);
+                        }));
     }
 
     public boolean isCustomerRegistrationProvided(Transaction request) {

@@ -1,24 +1,15 @@
 package com.kingfisher.payment.api.optile.model;
 
-import java.util.Objects;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
-import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import com.kingfisher.payment.api.optile.model.ClientInfo;
-import com.kingfisher.payment.api.optile.model.Customer;
-import com.kingfisher.payment.api.optile.model.Installment;
-import com.kingfisher.payment.api.optile.model.Mandate;
-import com.kingfisher.payment.api.optile.model.Payment;
-import com.kingfisher.payment.api.optile.model.Product;
-import com.kingfisher.payment.api.optile.model.RecurringCallback;
-import com.kingfisher.payment.api.optile.model.RecurringPreselection;
-import com.kingfisher.payment.api.optile.model.Style;
+
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
-import javax.validation.Valid;
-import javax.validation.constraints.*;
+import java.util.Objects;
 
 /**
  * RecurringTransaction

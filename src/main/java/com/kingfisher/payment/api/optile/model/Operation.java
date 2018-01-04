@@ -1,22 +1,10 @@
 package com.kingfisher.payment.api.optile.model;
 
-import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import com.kingfisher.payment.api.optile.model.AccountInputData;
-import com.kingfisher.payment.api.optile.model.ClientInfo;
-import com.kingfisher.payment.api.optile.model.Installment;
-import com.kingfisher.payment.api.optile.model.Mandate;
-import com.kingfisher.payment.api.optile.model.Payment;
-import com.kingfisher.payment.api.optile.model.Product;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+
 import javax.validation.Valid;
-import javax.validation.constraints.*;
+import java.util.*;
 
 /**
  * Operation

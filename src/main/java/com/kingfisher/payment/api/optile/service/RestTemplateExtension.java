@@ -30,13 +30,15 @@ public class RestTemplateExtension {
     @Autowired
     private ValidatorUtil validatorUtil;
 
-    public <T> ResponseEntity<T> execute(Class<T> responseEntityType, String URI, HttpMethod method, HttpEntity<?> requestEntity) {
+    public <T> ResponseEntity<T> execute(Class<T> responseEntityType, String uri, HttpMethod method, HttpEntity<?> requestEntity) {
 
-        ResponseEntity<T> response = restTemplate.exchange(baseURL + URI, method, requestEntity, responseEntityType);
+        ResponseEntity<T> response = restTemplate.exchange(baseURL + uri, method, requestEntity, responseEntityType);
         Set<ConstraintViolation<T>> violations = validator.validate(response.getBody(), Optile.class);
 
+
         if(!violations.isEmpty()) {
-            logger.warn("Not valid Optile Response {}", validatorUtil.collectViolations(violations));
+            String violationsStr = validatorUtil.collectViolations(violations);
+            logger.warn("Not valid Optile Response {}", violationsStr);
         }
 
         return response;

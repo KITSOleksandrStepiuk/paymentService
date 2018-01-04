@@ -2,9 +2,9 @@ package com.kingfisher.payment.api.optile.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
+import org.joda.time.LocalDate;
 
 import javax.validation.Valid;
-import org.joda.time.LocalDate;
 import java.util.Objects;
 
 /**

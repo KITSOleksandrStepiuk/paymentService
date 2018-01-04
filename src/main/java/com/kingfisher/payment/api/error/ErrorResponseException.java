@@ -4,7 +4,7 @@ import com.kingfisher.payment.api.optile.error.model.ErrorResponse;
 
 public class ErrorResponseException extends RuntimeException {
 
-    private ErrorResponse errorResponse;
+    private final transient ErrorResponse errorResponse;
 
     public ErrorResponse getErrorResponse() {
         return errorResponse;

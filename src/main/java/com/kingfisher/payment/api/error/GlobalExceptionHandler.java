@@ -18,14 +18,13 @@ import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Order(value = 1)
 @ControllerAdvice
 class GlobalExceptionHandler {
 
+    public static final String PROCESSING = "Processing: {}";
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
@@ -42,7 +41,7 @@ class GlobalExceptionHandler {
 
     @ExceptionHandler({ErrorResponseException.class})
     public ResponseEntity handle(ErrorResponseException e) {
-        logger.trace("Processing: {}", e.getStackTrace());
+        logger.trace(PROCESSING, e.getStackTrace());
 
         final ErrorInfo errorInfo;
 
@@ -56,7 +55,7 @@ class GlobalExceptionHandler {
             errorInfo = objectMapper.readValue(e.getErrorResponse().getDetails(), ErrorInfo.class);
 
         } catch (IOException ex) {
-            logger.trace("Processing: {}", ex.getStackTrace());
+            logger.trace(PROCESSING, ex.getStackTrace());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                                  .body(new ErrorInfo(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()));
         }
@@ -66,7 +65,7 @@ class GlobalExceptionHandler {
 
     @ExceptionHandler({ResourceAccessException.class})
     public ResponseEntity handle(ResourceAccessException e) {
-        logger.trace("Processing: {}", e.getStackTrace());
+        logger.trace(PROCESSING, e.getStackTrace());
 
         HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
 
@@ -81,7 +80,7 @@ class GlobalExceptionHandler {
 
     @ExceptionHandler({InputDTOValidationException.class})
     public ResponseEntity handle(InputDTOValidationException e) {
-        logger.trace("Processing: {}", e.getStackTrace());
+        logger.trace(PROCESSING, e.getStackTrace());
 
         ErrorInfo info = new ErrorInfo("Errors: " + validatorUtil.collectViolations(e.getViolations()));
 
@@ -90,7 +89,7 @@ class GlobalExceptionHandler {
 
     @ExceptionHandler({UnknownHostException.class})
     public ResponseEntity handle(UnknownHostException e){
-        logger.trace("Processing: {}", e.getStackTrace());
+        logger.trace(PROCESSING, e.getStackTrace());
 
         ErrorInfo info = new ErrorInfo(e.getMessage());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(info);
