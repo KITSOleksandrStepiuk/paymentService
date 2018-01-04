@@ -118,19 +118,25 @@ public class PaymentController {
                                                 @PathVariable("orderId") String orderId,
                                                 @RequestBody Operation operation) {
 
-        final AtomicReference<Payout> payout = new AtomicReference<>();
+        final AtomicReference<Payout> payoutReference = new AtomicReference<>();
 
         Optional<TransactionLogInfo> transactionLogInfo = transactionLogService.getLatestOrderTransaction(orderId);
 
         transactionLogInfo.ifPresent(trnLogInfo -> {
-            if (trnLogInfo.getCustomerRegistrationInfo().getProfileId().equalsIgnoreCase(profileId)){
-                payout.set(optileService.chargePayment(trnLogInfo.getListId(), operation));
-                customerService.saveCustomerRegistrationInfo(payout.get());
+
+            Payout chargePayout = optileService.chargePayment(trnLogInfo.getListId(), operation);
+            customerService.saveOptileDataForCustomer(chargePayout);
+
+            if(chargePayout.getReturnCode().getName().equals("OK")) {
+                trnLogInfo.setChargeId(chargePayout.getIdentification().getLongId());
+                transactionLogService.saveOrUpdateTransaction(trnLogInfo);
             }
+
+            payoutReference.set(chargePayout);
 
         });
 
-        return ResponseEntity.status(HttpStatus.OK).body(payout.get());
+        return ResponseEntity.status(HttpStatus.OK).body(payoutReference.get());
     }
 
     //TODO refactor like chargePayment with input parameters order or profileId or both.

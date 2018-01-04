@@ -29,7 +29,7 @@ public class CustomerService {
         transactionRequest.getCustomer().setRegistration(registration);
     }
 
-    public void saveCustomerRegistrationInfo(Payout response) {
+    public void saveOptileDataForCustomer(Payout response) {
         response.getRedirect()
                 .getParameters()
                 .stream()
@@ -37,10 +37,10 @@ public class CustomerService {
                 .findFirst()
                 .ifPresent( customerRegId -> transactionLogService.getTransactionLogById(response.getIdentification().getTransactionId())
                         .ifPresent(transactionLogInfo -> {
-                            transactionLogInfo.getCustomerRegistrationInfo().setOptileCustomerId(customerRegId.getValue());
-                            transactionLogInfo.getCustomerRegistrationInfo().setOptileCustomerPassword("password1");
-                            transactionLogInfo.setChargeId(response.getIdentification().getLongId());
-                            transactionLogService.saveOrUpdateTransaction(transactionLogInfo);
+                            CustomerRegistrationInfo customerRegistrationInfo = transactionLogInfo.getCustomerRegistrationInfo();
+                            customerRegistrationInfo.setOptileCustomerId(customerRegId.getValue());
+                            customerRegistrationInfo.setOptileCustomerPassword("password1");
+                            customerRepository.saveAndFlush(customerRegistrationInfo);
                         }));
     }
 
