@@ -57,7 +57,7 @@ public class TransactionLogService {
         }
 
         TransactionLogInfo transactionLogInfo = new TransactionLogInfo();
-        transactionLogInfo.setTimestamp(DateTime.now().getMillis());
+        transactionLogInfo.setTimestamp(response.getTimestamp().getMillis());
         transactionLogInfo.setCustomerRegistrationInfo(customerRegistrationInfo);
         transactionLogInfo.setTransactionId(response.getIdentification().getTransactionId());
         transactionLogInfo.setListId(response.getIdentification().getLongId());
@@ -66,14 +66,14 @@ public class TransactionLogService {
         saveOrUpdateTransaction(transactionLogInfo);
     }
 
-    private String generateTransactionId(@NotNull String orderId, @NotNull String custromerId) {
+    private String generateTransactionId(@NotNull String orderId, @NotNull String customerId) {
 
         return new StringBuilder()
                 .append(DateTime.now().getMillis())
                 .append("-")
                 .append(orderId)
                 .append("-")
-                .append(custromerId).toString();
+                .append(customerId).toString();
 
     }
 

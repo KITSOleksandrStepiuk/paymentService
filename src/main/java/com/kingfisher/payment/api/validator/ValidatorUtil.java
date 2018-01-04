@@ -12,7 +12,7 @@ public class ValidatorUtil {
 
     public<T> String collectViolations(Set<ConstraintViolation<T>> violations) {
 
-        StringBuilder sb = new StringBuilder("[ ");
+        StringBuilder sb = new StringBuilder();
 
         List<String> errors = violations.stream()
                 .map(v -> v.getPropertyPath().toString() + " " + v.getMessage())
@@ -20,7 +20,7 @@ public class ValidatorUtil {
                 .collect(Collectors.toList());
 
         errors.forEach( err -> sb.append(err).append(", "));
-        sb.replace(sb.length()-2, sb.length(), " ]");
+        sb.replace(sb.length()-2, sb.length(), "");
 
         return sb.toString();
     }
