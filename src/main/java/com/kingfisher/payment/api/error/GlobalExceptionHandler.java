@@ -34,7 +34,7 @@ class GlobalExceptionHandler {
 
     private final Map<Class<? extends Throwable>, HttpStatus> rules = new HashMap<>();
 
-    {
+    public GlobalExceptionHandler() {
         rules.put(ConnectTimeoutException.class, HttpStatus.REQUEST_TIMEOUT);
         rules.put(SocketTimeoutException.class, HttpStatus.REQUEST_TIMEOUT);
     }

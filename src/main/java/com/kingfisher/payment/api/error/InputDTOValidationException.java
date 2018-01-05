@@ -6,7 +6,7 @@ import javax.validation.ConstraintViolation;
 import java.util.Set;
 
 public class InputDTOValidationException extends Exception {
-    private transient Set<ConstraintViolation<ListRequestDTO>> violations;
+    private final transient Set<ConstraintViolation<ListRequestDTO>> violations;
 
     public InputDTOValidationException(Set<ConstraintViolation<ListRequestDTO>> violations) {
         super();
@@ -15,6 +15,7 @@ public class InputDTOValidationException extends Exception {
 
     public InputDTOValidationException(String msg) {
         super(msg);
+        violations = null;
     }
 
     public Set<ConstraintViolation<ListRequestDTO>> getViolations() {

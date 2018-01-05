@@ -27,6 +27,7 @@ public class NotificationController {
             @ApiResponse(code =  503, message ="Server Internal Error", response = ErrorInfo.class)
     })
     @GetMapping("/notification")
+    @SuppressWarnings("squid:S00107")
     public ResponseEntity getOptileNotification(@RequestParam String transactionId,
                                                 @RequestParam String longId,
                                                 @RequestParam String shortId,
