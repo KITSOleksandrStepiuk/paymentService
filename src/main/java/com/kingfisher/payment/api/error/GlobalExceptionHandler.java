@@ -82,9 +82,15 @@ class GlobalExceptionHandler {
     public ResponseEntity handle(InputDTOValidationException e) {
         logger.trace(PROCESSING, e.getStackTrace());
 
-        ErrorInfo info = new ErrorInfo("Errors: " + validatorUtil.collectViolations(e.getViolations()));
+        ErrorInfo errorInfo;
 
-        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(info);
+        if (e.getViolations() == null || e.getViolations().isEmpty()) {
+            errorInfo = new ErrorInfo("Errors: " + e.getMessage());
+        } else {
+            errorInfo = new ErrorInfo("Errors: " + validatorUtil.collectViolations(e.getViolations()));
+        }
+
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(errorInfo);
     }
 
     @ExceptionHandler({UnknownHostException.class})

@@ -106,17 +106,20 @@ public class PaymentController {
         return ResponseEntity.status(HttpStatus.OK).body(optileService.closePaymentCharge(chargeId, transaction));
     }
 
-    @ApiOperation(value = "Charge payment from ATG")
+    @ApiOperation(value = "Charge payment from ATG", nickname = "chargePayment")
     @ApiResponses({
             @ApiResponse(code =  503, message ="Server Internal Error", response = ErrorInfo.class)
     })
     @PostMapping(
-            path = "/session/charge/{profileId}/{orderId}",
+            path = "/session/charge/{orderId}",
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Payout> chargePayment(@PathVariable("profileId") String profileId,
-                                                @PathVariable("orderId") String orderId,
-                                                @RequestBody Operation operation) {
+    public ResponseEntity<Payout> chargePayment(@PathVariable("orderId") String orderId,
+                                                @RequestBody String requestBody) throws InputDTOValidationException {
+
+        if(!requestBody.equals("{}")) {
+            throw new InputDTOValidationException("Request body for operation should be {}");
+        }
 
         final AtomicReference<Payout> payoutReference = new AtomicReference<>();
 
@@ -124,7 +127,7 @@ public class PaymentController {
 
         transactionLogInfo.ifPresent(trnLogInfo -> {
 
-            Payout chargePayout = optileService.chargePayment(trnLogInfo.getListId(), operation);
+            Payout chargePayout = optileService.chargePayment(trnLogInfo.getListId(), requestBody);
             customerService.saveOptileDataForCustomer(chargePayout);
 
             if(chargePayout.getReturnCode().getName().equals("OK")) {

@@ -35,7 +35,6 @@ public class RestTemplateExtension {
         ResponseEntity<T> response = restTemplate.exchange(baseURL + uri, method, requestEntity, responseEntityType);
         Set<ConstraintViolation<T>> violations = validator.validate(response.getBody(), Optile.class);
 
-
         if(!violations.isEmpty()) {
             String violationsStr = validatorUtil.collectViolations(violations);
             logger.warn("Not valid Optile Response {}", violationsStr);

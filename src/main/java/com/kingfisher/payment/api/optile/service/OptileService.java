@@ -52,8 +52,8 @@ public class OptileService {
         return restTemplateExtention.execute(Payout.class, MessageFormat.format(closeChargeEndpoint, chargeId), HttpMethod.POST, entity).getBody();
     }
 
-    public Payout chargePayment(String listId, Operation operation) {
-        HttpEntity<Operation> entity = new HttpEntity<>(operation, getHeaders());
+    public Payout chargePayment(String listId, String requestBody) {
+        HttpEntity<String> entity = new HttpEntity<>(requestBody, getHeaders());
 
         return restTemplateExtention.execute(Payout.class, MessageFormat.format(chargePaymentEndpoint, listId), HttpMethod.POST, entity).getBody();
     }
@@ -65,7 +65,7 @@ public class OptileService {
     }
 
     public ResponseEntity cancelListSession(String listId) {
-        HttpEntity<Operation> entity = new HttpEntity<>(getHeaders());
+        HttpEntity entity = new HttpEntity<>(getHeaders());
 
         return restTemplateExtention.execute(Payout.class, MessageFormat.format(cancelListSessionEndpoint, listId), HttpMethod.DELETE, entity);
     }

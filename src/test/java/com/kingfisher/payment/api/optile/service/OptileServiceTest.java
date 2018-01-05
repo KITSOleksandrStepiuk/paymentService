@@ -51,7 +51,7 @@ public class OptileServiceTest {
     @Test()
     public void chargePaymentTest() {
         given(customRestTemplate.execute(eq(Payout.class), any(String.class), any(HttpMethod.class), any(HttpEntity.class))).willReturn(ResponseEntity.ok(new Payout()));
-        Payout chargePayout = optileService.chargePayment(LIST_ID, new Operation());
+        Payout chargePayout = optileService.chargePayment(LIST_ID, "{}");
         verify(customRestTemplate, times(1)).execute(eq(Payout.class), any(String.class), any(HttpMethod.class), any(HttpEntity.class));
     }
 
